@@ -1,117 +1,97 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
-import type {PropsWithChildren} from 'react';
+import React, {useState} from 'react';
 import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
   StyleSheet,
-  Text,
-  useColorScheme,
   View,
+  Text,
+  Image,
+  TouchableOpacity,
+  Modal,
 } from 'react-native';
+import Slider from '@react-native-community/slider';
+import {ModalPassword} from './src/components/modal';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+let charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+function App(): React.JSX.Element {
+  const [size, setSize] = useState(10);
+  const [password, setPassword] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+  function generatePassword() {
+    let generatedPassword = '';
+
+    for (let i = 0, n = charset.length; i < size; i++) {
+      generatedPassword += charset.charAt(Math.floor(Math.random() * n));
+    }
+    setPassword(generatedPassword);
+    setModalVisible(true);
+  }
+
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
+    <View style={styles.container}>
+      <Image source={require('./src/assets/logo.png')} style={styles.logo} />
+      <Text style={styles.title}>{size} caracteres</Text>
+      <View style={styles.area}>
+        <Slider
+          style={{
+            height: 50,
+          }}
+          minimumValue={6}
+          maximumValue={60}
+          maximumTrackTintColor="#ff0000"
+          minimumTrackTintColor="#000"
+          thumbTintColor="#392de9"
+          value={size}
+          onValueChange={value => setSize(parseInt(value.toFixed(0)))}
+        />
+      </View>
+      <TouchableOpacity style={styles.button} onPress={generatePassword}>
+        <Text style={styles.buttonText}>Gerar senha</Text>
+      </TouchableOpacity>
+      <Modal visible={modalVisible} animationType="fade" transparent={true}>
+        <ModalPassword
+          password={password}
+          handleClose={() => setModalVisible(false)}
+        />
+      </Modal>
     </View>
   );
 }
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
-
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  container: {
+    flex: 1,
+    backgroundColor: '#F3F3FF',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+  logo: {
+    marginBottom: 60,
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
+  title: {
+    fontSize: 30,
+    fontWeight: 'bold',
   },
-  highlight: {
-    fontWeight: '700',
+  area: {
+    marginTop: 14,
+    marginBottom: 14,
+    width: '80%',
+    backgroundColor: '#FFF',
+    borderRadius: 8,
+    padding: 6,
+  },
+  button: {
+    backgroundColor: '#392de9',
+    width: '80%',
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
+    marginBottom: 18,
+  },
+  buttonText: {
+    color: '#FFF',
+    fontSize: 20,
   },
 });
 
