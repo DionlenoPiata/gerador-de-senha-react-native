@@ -8,6 +8,7 @@ import {
   Alert,
 } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
+import useStorage from '../../hooks/useStorage';
 
 interface ModalPasswordProps {
   password: string;
@@ -18,9 +19,12 @@ export function ModalPassword({
   password,
   handleClose,
 }: ModalPasswordProps): React.JSX.Element {
-  function handleCopyPassword() {
+  const {saveItem} = useStorage();
+
+  async function handleCopyPassword() {
     Clipboard.setString(password);
     Alert.alert('Senha copiada com sucesso!');
+    await saveItem('@pass', password);
     handleClose();
   }
 
@@ -37,7 +41,9 @@ export function ModalPassword({
           <TouchableOpacity style={styles.button} onPress={handleClose}>
             <Text style={styles.buttonText}>Voltar</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.buttonSave]}>
+          <TouchableOpacity
+            style={[styles.button, styles.buttonSave]}
+            onPress={handleCopyPassword}>
             <Text style={styles.buttonSaveText}>Salvar senha</Text>
           </TouchableOpacity>
         </View>
